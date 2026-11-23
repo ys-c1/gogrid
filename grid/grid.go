@@ -1,6 +1,9 @@
 package grid
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 var (
 	ErrShape  = errors.New("行宽不一致")
@@ -51,4 +54,22 @@ func (g *Grid) WalkableCount() int {
 		}
 	}
 	return n
+}
+
+// Set 直接修改某格的可行走状态（门的开/关）。越界返回带坐标的 ErrOOB。
+func (g *Grid) Set(p Point, walkable bool) error {
+	if p.X < 0 || p.Y < 0 || p.X >= g.W || p.Y >= g.H {
+		return fmt.Errorf("%w: 坐标 (%d,%d) 不在 %dx%d 网格内", ErrOOB, p.X, p.Y, g.W, g.H)
+	}
+	g.cells[p.Y][p.X] = walkable
+	return nil
+}
+
+// Clone 深拷贝网格，用于基准对照与计时。
+func (g *Grid) Clone() *Grid {
+	cells := make([][]bool, g.H)
+	for y := range g.cells {
+		cells[y] = append([]bool(nil), g.cells[y]...)
+	}
+	return &Grid{W: g.W, H: g.H, cells: cells}
 }
