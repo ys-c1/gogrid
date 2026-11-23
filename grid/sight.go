@@ -18,7 +18,7 @@ func (g *Grid) Visible(a, b Point) (bool, error) {
 	if y0 > y1 {
 		sy = -1
 	}
-	err := 0
+	err := dx - dy
 	for {
 		if !g.cells[y0][x0] {
 			return false, nil
