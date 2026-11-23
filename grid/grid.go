@@ -18,13 +18,14 @@ type Grid struct {
 
 func Parse(rows []string) (*Grid, error) {
 	if len(rows) == 0 || len(rows[0]) == 0 {
-		return nil, ErrEmpty
+		return nil, &CoordError{Err: ErrEmpty, P: Point{0, 0}}
 	}
 	w := len(rows[0])
 	g := &Grid{W: w, H: len(rows), cells: make([][]bool, len(rows))}
 	for y, row := range rows {
 		if len(row) != w {
-			return nil, ErrShape
+			// 报出该行第一个偏离首行宽度的列位置。
+			return nil, &CoordError{Err: ErrShape, P: Point{w, y}}
 		}
 		g.cells[y] = make([]bool, w)
 		for x := 0; x < w; x++ {
@@ -36,7 +37,7 @@ func Parse(rows []string) (*Grid, error) {
 
 func (g *Grid) Walkable(p Point) (bool, error) {
 	if p.X < 0 || p.Y < 0 || p.X >= g.W || p.Y >= g.H {
-		return false, ErrOOB
+		return false, &CoordError{Err: ErrOOB, P: p}
 	}
 	return g.cells[p.Y][p.X], nil
 }
